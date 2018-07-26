@@ -11,7 +11,7 @@ const std::string listenerEndPoint = "tcp://*:5555";
 ServerKernel::~ServerKernel()
 {}
 
-void 
+void
 ServerKernel::setup(int argc, char** argv) {
   context_   = std::make_unique<zmq::context_t >( 1 );
   publisher_ = std::make_unique<zmq::socket_t >( *context_, ZMQ_PUB );
@@ -28,17 +28,17 @@ ServerKernel::setup(int argc, char** argv) {
   //std::cout << "communication layer setup complete" << std::endl;
 }
 
-void 
+void
 ServerKernel::processMessage(const zmq::message_t& msg) {
   // do nothing.
 }
 
-void 
+void
 ServerKernel::updateFrame() {
   // do nothing.
 }
 
-int 
+int
 ServerKernel::run() {
   while (1) {
     _pollForClientMessage();
@@ -48,19 +48,20 @@ ServerKernel::run() {
   return 0;
 }
 
-void 
+void
 ServerKernel::sendMessageToClients(zmq::message_t msg) {
   publisher_->send(msg, ZMQ_NOBLOCK);
 }
 
-void 
+void
 ServerKernel::_pollForClientMessage() {
   zmq::message_t request;
   if (listener_->recv(&request, ZMQ_NOBLOCK)) {
     processMessage(request);
 
     //@todo - Update so that reply message can be determined from result of postMessage call above.
-    zmq::message_t reply(20);
+    std::size_t size = 20U;
+    zmq::message_t reply(size);
     snprintf((char*)reply.data(), 20, "OK");
     listener_->send(reply);
   }
